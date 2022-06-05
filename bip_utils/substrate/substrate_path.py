@@ -24,13 +24,8 @@
 from __future__ import annotations
 import re
 from functools import lru_cache
-from typing import Dict, Iterator, List, Optional, Sequence, Type, Union
-from scalecodec.base import RuntimeConfigurationObject
-from bip_utils.substrate.scale.substrate_scale_enc_base import SubstrateScaleEncoderBase
-from bip_utils.substrate.scale import (
-    SubstrateScaleU8Encoder, SubstrateScaleU16Encoder, SubstrateScaleU32Encoder,
-    SubstrateScaleU64Encoder, SubstrateScaleU128Encoder, SubstrateScaleU256Encoder
-)
+from typing import Dict, Iterator, List, Optional, Sequence, Union
+from scalecodec.base import RuntimeConfigurationObject, ScaleType
 from bip_utils.substrate.substrate_ex import SubstratePathError
 from bip_utils.utils.misc import CryptoUtils
 
@@ -49,13 +44,13 @@ class SubstratePathConst:
     HARD_PATH_PREFIX: str = "//"
 
     # SCALE encoders for integers
-    SCALE_INT_ENCODERS: Dict[int, SubstrateScaleEncoderBase] = {
-        8: SubstrateScaleU8Encoder(),
-        16: SubstrateScaleU16Encoder(),
-        32: SubstrateScaleU32Encoder(),
-        64: SubstrateScaleU64Encoder(),
-        128: SubstrateScaleU128Encoder(),
-        256: SubstrateScaleU256Encoder(),
+    SCALE_INT_ENCODERS: Dict[int, ScaleType] = {
+        8: RuntimeConfigurationObject().create_scale_object("U8"),
+        16: RuntimeConfigurationObject().create_scale_object("U16"),
+        32: RuntimeConfigurationObject().create_scale_object("U32"),
+        64: RuntimeConfigurationObject().create_scale_object("U64"),
+        128: RuntimeConfigurationObject().create_scale_object("U128"),
+        256: RuntimeConfigurationObject().create_scale_object("U256"),
     }
 
 
@@ -160,8 +155,8 @@ class SubstratePathElem:
             scale_enc = RuntimeConfigurationObject().create_scale_object("Bytes")
 
         # Encode element
-        enc_data = scale_enc.Encode(self.m_elem)
-        #enc_data = bytes(scale_enc.data.data)
+        scale_enc.encode(self.m_elem)
+        enc_data = bytes(scale_enc.data.data)
 
         # Compute chain code
         max_len = SubstratePathConst.ENCODED_ELEM_MAX_BYTE_LEN
