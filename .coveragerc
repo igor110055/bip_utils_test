@@ -1,0 +1,11 @@
+[report]
+exclude_lines =
+    pragma: no cover
+    @abstract
+    @overload
+
+[run]
+omit =
+    bip_utils\ecc\lib\ed25519_helper.py
+    bip_utils\ecc\lib\ed25519_monero.py
+    .tox/*
